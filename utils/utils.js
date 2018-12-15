@@ -7,7 +7,7 @@
  */
 exports.callable = function (obj, fn) {
     if (typeof fn !== "undefined") {
-        fn = method.bind(obj);
+        fn = fn.bind(obj);
     }
 
     const handler = {
