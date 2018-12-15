@@ -1,11 +1,22 @@
-exports.callable = function (obj, methodName) {
+/**
+ * Allows given object to be called like a method. When called like a method, method is called. If no function is provided, __call__ will be called on the object instead.
+ * 
+ * @param {Object} obj - Object to be called like a method
+ * @param {Function} [fn] - Called when object called like a method
+ * @returns {Object} - New callable object
+ */
+exports.callable = function (obj, fn) {
+    if (typeof fn !== "undefined") {
+        fn = method.bind(obj);
+    }
+
     const handler = {
         get: function (self, key) {
             return self.__inherit__[key];
         },
         apply: function (self, thisValue, args) {
-            if (typeof methodName !== "undefined" && typeof obj[methodName] !== "undefined") {
-                return obj[methodName].apply(self, args);
+            if (typeof fn !== "undefined") {
+                return fn.apply(self, args);
             }
             return (self.__call__ || self.__inherit__.__call__).apply(self, args);
         }
@@ -15,6 +26,12 @@ exports.callable = function (obj, methodName) {
     return p;
 }
 
+/**
+ * Takes obects' values and merges them with precedence from left to right.
+ * 
+ * @param {...Object} objects Objects 
+ * @returns {Object} - Resulting object
+ */
 exports.defaults = function (...objects) {
     const result = {};
     for (const object of objects) {
