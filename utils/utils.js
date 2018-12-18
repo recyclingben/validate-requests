@@ -5,25 +5,26 @@
  * @param {Function} [fn] - Called when object called like a method
  * @returns {Object} - New callable object
  */
-exports.callable = function (obj, fn) {
-    if (typeof fn !== "undefined") {
-        fn = fn.bind(obj);
-    }
-
-    const handler = {
-        get: function (self, key) {
-            return self.__inherit__[key];
-        },
-        apply: function (self, thisValue, args) {
-            if (typeof fn !== "undefined") {
-                return fn.apply(self, args);
-            }
-            return (self.__call__ || self.__inherit__.__call__).apply(self, args);
+exports.callable = function (type, fnKey = "__call__") {
+    /* Allows use of static members of class. On construction, then allow callability. */
+    return new Proxy(type, {
+        construct(target, args) {
+            return create(new target(...args));
         }
+    });
+
+    function create(obj) {
+        var p = new Proxy(function () { }, {
+            get(target, key) {
+                return target.__inherit__[key];
+            },
+            apply(target, thisArg, args) {
+                return (obj[fnKey]).apply(target, args);
+            }
+        });
+        p.__inherit__ = obj;
+        return p;
     }
-    var p = new Proxy(function () { }, handler);
-    p.__inherit__ = obj;
-    return p;
 }
 
 /**
@@ -45,4 +46,29 @@ exports.defaults = function (...objects) {
         }
     }
     return result;
+}
+
+/**
+ * Takes string and capitalizes first character, while optionally lower-casing the rest.
+ * 
+ * @param {string} str - String to capitalize
+ * @param {boolean} [lowerRest=false] - Whether or not to lower-case the rest of the letters
+ * @returns {string} - Resulting string
+ */
+exports.case = {
+    capitalize(str, lowerRest = false) {
+        if (lowerRest) {
+            str = str.toLowerCase();
+        }
+        return str.charAt(0).toUpperCase() + str.substr(1);
+    },
+    spaceToCamel(str) {
+        return str
+            .replace(/\s(.)/g, char => char.toUpperCase())
+            .replace(/\s/, "");
+    },
+    camelToSpace(str) {
+        return str
+            .replace(/[A-Z]/g, char => " " + char.toLowerCase())
+    }
 }
