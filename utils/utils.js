@@ -1,4 +1,10 @@
 /**
+ * A collection of utility methods.
+ * 
+ * @module utils/utils
+ */
+
+/**
  * Allows given object to be called like a method. When called like a method, method is called. If no function is provided, __call__ will be called on the object instead.
  * 
  * @param {Object} obj - Object to be called like a method
@@ -70,5 +76,16 @@ exports.case = {
     camelToSpace(str) {
         return str
             .replace(/[A-Z]/g, char => " " + char.toLowerCase())
+    },
+    pascalToSpace(str) {
+        return str
+            .replace(/(?<!^)[A-Z]/g, char => " " + char)
+            .toLowerCase();
+    },
+    isPascalCase(str) {
+        return /^[A-Z][a-zA-z]+$/g.test(str);
+    },
+    isCamelCase(str) {
+        return /^[a-z][a-zA-Z]+$/g.test(str);
     }
 }
