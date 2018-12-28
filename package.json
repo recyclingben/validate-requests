@@ -1,7 +1,7 @@
 {
     "name": "validate-requests",
-    "version": "1.2.1",
+    "version": "1.2.3",
     "dependencies": {
-        "validator": "^10.9.0"
+        "validator": "^10.10.0"
     }
 }
